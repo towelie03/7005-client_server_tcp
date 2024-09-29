@@ -1,16 +1,14 @@
 import socket
 import sys
 import argparse
+from ipaddress import ip_address
 
-# Global variables
-SOCKET_PATH = '/tmp/socket'
 LINE_LEN = 4096
-
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Client-server application using TCP sockets over the network")
-    parser.add_argument('-i', '--ip', required=True, help="Accepts the ip address to send on")
-    parser.add_argument('-p', '--port', required=True, help="Accepts the port to send on")
+    parser.add_argument('-i', '--ip', type=ip_address, required=True, help="Accepts the ip address to send on")
+    parser.add_argument('-p', '--port', type=int, required=True, help="Accepts the port to send on")
     parser.add_argument('-f', '--file', nargs='+', help="Path of files to send")
     return parser.parse_args()  # Return the parsed arguments
 
