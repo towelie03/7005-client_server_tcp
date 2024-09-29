@@ -30,12 +30,12 @@ def parse_args():
 #         print(f"No existing socket file to remove at: {SOCKET_PATH}")
 #
 
-def setup_server_socket(PORT):
+def setup_server_socket(port):
     try:        
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_sock:
-            server_sock.bind((HOST, PORT))
+            server_sock.bind((HOST, port))
             server_sock.listen()
-            print(f"Server listening on port {PORT}")
+            print(f"Server listening on port {port}")
             return server_sock
     except Exception as e:
         print(f"Error: Unable to create server socket: {e}")
@@ -67,7 +67,7 @@ def wait_for_connection(server_sock):
 
 def main():
     args = parse_args()
-    server_sock = setup_server_socket(args.PORT)
+    server_sock = setup_server_socket(args.port)
     wait_for_connection(server_sock)
     
 
