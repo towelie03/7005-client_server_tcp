@@ -32,7 +32,7 @@ def handle_client(client_socket):
                 break
             file_data += chunk
         count = sum(c.isalpha() for c in file_data.decode('utf-8'))
-        client_socket.send(str(count).encode('utf-8'))
+        client_socket.send(str(count).encode('utf-8', errors='ignore'))
     finally:
         client_socket.close()
 
@@ -48,10 +48,13 @@ def wait_for_connection(server_sock):
 
 
 def main():
-    args = parse_args()
-    PORT = args.port
-    server_sock = setup_server_socket(PORT)
-    wait_for_connection(server_sock)
+    try:
+        args = parse_args()
+        PORT = args.port
+        server_sock = setup_server_socket(PORT)
+        wait_for_connection(server_sock)
+    except KeyboardInterrupt:
+        print("\nClosing the connection")
     
 
 if __name__=="__main__":
