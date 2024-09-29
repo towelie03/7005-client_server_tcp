@@ -16,6 +16,7 @@ def setup_server_socket(PORT):
     try:
         server_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         server_sock.bind(connection)
+        server_sock.connect(connection)
         server_sock.listen(5)
         print(f"Server listening on port {PORT}")
         return server_sock
