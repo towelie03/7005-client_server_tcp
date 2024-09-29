@@ -45,16 +45,17 @@ def wait_for_connection(server_sock):
             client_handler.start()
     except Exception as e:
         print(f"Error: Unable to accept connection: {e}")
+    except KeyboardInterrupt:
+        print("Shutting down the server.")
+    finally:
+        server_sock.close()
 
 
 def main():
-    try:
-        args = parse_args()
-        PORT = args.port
-        server_sock = setup_server_socket(PORT)
-        wait_for_connection(server_sock)
-    except KeyboardInterrupt:
-        print("\nClosing the connection")
+    args = parse_args()
+    PORT = args.port
+    server_sock = setup_server_socket(PORT)
+    wait_for_connection(server_sock)
     
 
 if __name__=="__main__":
