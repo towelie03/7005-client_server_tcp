@@ -1,7 +1,5 @@
 import socket
 import sys
-import os
-import stat
 import argparse
 import threading
 
@@ -13,24 +11,9 @@ HOST = "0.0.0.0"
 def parse_args():
     parser = argparse.ArgumentParser(description="Client-server application using TCP sockets over the network")
     parser.add_argument('-p', '--port', required=True, help="Accepts the port to listen on")
-    return parser.parse_args()  # Return the parsed arguments
+    return parser.parse_args()  
 
-# def check_socket_path():
-#     if os.path.exists(SOCKET_PATH):
-#         # Attempt to check if it's a socket file
-#         try:
-#             if stat.S_ISSOCK(os.stat(SOCKET_PATH).st_mode):
-#                 os.remove(SOCKET_PATH)
-#                 print(f"Removed existing socket file: {SOCKET_PATH}")
-#             else:
-#                 print(f"Warning: '{SOCKET_PATH}' exists but is not a socket file.")
-#         except Exception as e:
-#             print(f"Error checking socket file: {e}")
-#     else:
-#         print(f"No existing socket file to remove at: {SOCKET_PATH}")
-#
-
-def setup_server_socket(port):
+def setup_server(port):
     try:        
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_sock:
             server_sock.bind((HOST, port))
@@ -67,7 +50,7 @@ def wait_for_connection(server_sock):
 
 def main():
     args = parse_args()
-    server_sock = setup_server_socket(args.port)
+    server_sock = setup_server(args.port)
     wait_for_connection(server_sock)
     
 

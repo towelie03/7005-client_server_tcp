@@ -14,10 +14,10 @@ def parse_args():
     parser.add_argument('-f', '--file', nargs='+', help="Path of files to send")
     return parser.parse_args()  # Return the parsed arguments
 
-def connect_to_server(IP, PORT):
+def connect_to_server(ip, port):
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-            sock.connect((IP, PORT))
+            sock.connect((ip, port))
             return sock
     except Exception as e:
         print(f"Error: Unable to connect to server socket: {e}")
@@ -44,10 +44,10 @@ def receive_response(sock):
 
 def main():
     args = parse_args()
-    sock = connect_to_server(args.IP, args.PORT)
+    sock = connect_to_server(args.ip, args.port)
     send_file(sock, args.file)
     response = receive_response(sock)
-    print(f"Number of alphabetic letters")
+    print(f"Number of alphabetic letters: {response}")
     sock.close()
 
 if __name__=="__main__":
