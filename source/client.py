@@ -23,11 +23,13 @@ def connect_to_server(ip, port):
 
 def send_file(sock, file_path):
     try:
-        while True:
-            with open(file_path, 'rb') as file:
-                file_data = file.read()
+        with open(file_path, 'rb') as file:
+            while True:
+                file_data = file.read(LINE_LEN)
+                if not file_data:
+                    break
                 sock.sendall(file_data)
-                print("File sent successfully.")
+            print("File sent successfully.")
     except Exception as e:
         print(f"Error: Unable to send request: {e}")
         sock.close()
@@ -45,11 +47,13 @@ def main():
     args = parse_args()
     sock = connect_to_server(args.ip, args.port)
     print(f"Connecting to {args.ip} on port {args.port} with file {args.file}")
-
-    send_file(sock, args.file)
-    response = receive_response(sock)
-    print(f"Number of alphabetic letters: {response}")
-    sock.close()
+    
+    try:
+        send_file(sock, args.file)
+        response = receive_response(sock)
+        print(f"Number of alphabetic letters: {response}")
+    finally:
+        sock.close()
 
 if __name__=="__main__":
     main()
