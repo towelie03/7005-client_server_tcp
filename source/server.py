@@ -1,7 +1,7 @@
 import socket
 import sys
 import argparse
-import os
+import threading
 
 LINE_LEN = 4096
 HOST = "0.0.0.0"
@@ -36,12 +36,36 @@ def count_alphabetical(file_path):
     try:
         with open(file_path, 'rb') as file:
             data = file.read()
-            # Decode and count only alphabetic characters
             alphabetic_count = sum(c.isalpha() for c in data.decode('utf-8', errors='ignore'))
             return alphabetic_count
     except Exception as e:
         print(f"Error: Unable to count alphabetic letters: {e}")
-        return None  # Return None to indicate an error
+        return None  
+
+def handle_client(conn):
+    try:
+        file_path_bytes = bytearray()
+        while True:
+            chunk = conn.recv(LINE_LEN)
+            file_path_bytes.extend(chunk)
+            if b'\0' in chunk: 
+                break
+        
+        file_path = file_path_bytes[:file_path_bytes.index(0)].decode('utf-8')
+
+        print(f"Received file request: {file_path}")
+
+        alphabetic_count = count_alphabetical(file_path)
+        if alphabetic_count is not None:
+            send_reply(conn, str(alphabetic_count))
+        else:
+            send_reply(conn, f"Error: Unable to count characters in file '{file_path}'")
+
+    except Exception as e:
+        print(f"Error handling request: {e}")
+    finally:
+        conn.close()
+
 
 def send_reply(conn, reply):
     try:
@@ -58,39 +82,11 @@ def main():
     server_sock = setup_server_socket(PORT)
 
     try:
-        while True:
+       while True:
             conn = wait_for_connection(server_sock)
-            if conn is None:
-                continue
-
-            try:
-                # Read the file path until the null byte
-                file_path_bytes = bytearray()
-                while True:
-                    chunk = conn.recv(LINE_LEN)
-                    file_path_bytes.extend(chunk)
-                    if b'\0' in chunk:  # Stop reading when null byte is received
-                        break
-                
-                # Remove the null byte and decode the path
-                file_path = file_path_bytes[:file_path_bytes.index(0)].decode('utf-8')
-
-                print(f"Received file request: {file_path}")
-
-                # Count alphabetical characters in the requested file
-                alphabetic_count = count_alphabetical(file_path)
-                if alphabetic_count is not None:
-                    # Send back the count to the client
-                    send_reply(conn, str(alphabetic_count))
-                else:
-                    # Send an error message if counting failed
-                    send_reply(conn, f"Error: Unable to count characters in file '{file_path}'")
-
-            except Exception as e:
-                print(f"Error handling request: {e}")
-            finally:
-                conn.close()
-
+            if conn is not None:
+                client_thread = threading.Thread(target=handle_client, args=(conn,))
+                client_thread.start()   
     except KeyboardInterrupt:
         print("\nShutting down and closing the connection")
     finally:

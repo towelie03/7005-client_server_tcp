@@ -11,7 +11,7 @@ def parse_args():
     parser.add_argument('-i', '--ip', type=ip_address, required=True, help="Accepts the IP address to send on")
     parser.add_argument('-p', '--port', type=int, required=True, help="Accepts the port to send on")
     parser.add_argument('-f', '--file', type=str, required=True, help="Path of the file to send")
-    return parser.parse_args()  # Return the parsed arguments
+    return parser.parse_args()
 
 def connect_to_server(ip, port):
     try:
@@ -28,13 +28,11 @@ def send_file(sock, file_path):
         if not os.path.isfile(file_path):
             print(f"Error: The file '{file_path}' does not exist.")
             return
-        
-        # Send the file path first
+
         print(f"Sending file path: {file_path}")
         sock.sendall(file_path.encode('utf-8'))
-        sock.sendall(b'\0')  # Null byte as delimiter to indicate end of the file path
-        
-        # Send the file content
+        sock.sendall(b'\0')
+
         print(f"Sending file content of: {file_path}")
         with open(file_path, 'rb') as file:
             while True:
@@ -61,14 +59,14 @@ def receive_response(sock):
 def main():
     args = parse_args()
     sock = connect_to_server(args.ip, args.port)
-    
+
     try:
         send_file(sock, args.file)
-        response = receive_response(sock)  # Ensure this is called after sending the file
+        response = receive_response(sock)  
         print(f"Number of alphabetic letters: {response}")
     finally:
         if sock:
-            sock.close()  # Close the socket only after receiving the response
+            sock.close() 
 
 if __name__ == "__main__":
     main()
